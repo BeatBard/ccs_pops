@@ -1,0 +1,17 @@
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Twilio SDK
+twilio==8.11.0
+
+# Environment & Configuration
+python-dotenv==1.0.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Form Data
+python-multipart==0.0.6
+
+# Logging
+python-json-logger==2.0.7
