@@ -1,0 +1,5 @@
+dsr_name,outlet_id,avg_lipb,last_lipb,target_lipb,lipb_trend,month
+Nalin Perera,SD0001,3.0,3,4,Stable,2026-01
+Nalin Perera,SD0002,1.3,1,3,Declining,2026-01
+Nalin Perera,SD0003,4.0,4,4,Improving,2026-01
+Nalin Perera,SD0016,1.7,2,3,Stable,2026-01

@@ -1,0 +1,4 @@
+dsr_name,date,outlet_id,outlet_name,outlet_type,priority,target_sales,last_visit_sales,status,visit_order,completed
+Nalin Perera,2026-01-11,SD0001,Saman's Mart,SMMT,Yes,12000,13500,Pending,1,No
+Nalin Perera,2026-01-11,SD0002,City Bites Cafe,Eatery,No,10000,9200,Pending,2,No
+Nalin Perera,2026-01-11,SD0003,Perera Super,SMMT,Yes,15000,15800,Pending,3,No

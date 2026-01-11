@@ -1,0 +1,13 @@
+dsr_name,outlet_id,visit_date,visit_time,lipb,sku_count,sales_value,productive_visit,visit_duration_mins,notes
+Nalin Perera,SD0001,2026-01-10,10:30,3,3,13500,Yes,25,Good visit - restocked cooler
+Nalin Perera,SD0001,2026-01-03,11:00,4,4,14200,Yes,30,Excellent - sold new SKUs
+Nalin Perera,SD0001,2025-12-27,10:15,2,2,12800,Yes,20,Average visit
+Nalin Perera,SD0002,2026-01-09,14:30,1,1,9200,Yes,15,Low purchase - visibility issues noted
+Nalin Perera,SD0002,2026-01-02,15:00,2,2,10500,Yes,18,Better than last time
+Nalin Perera,SD0002,2025-12-26,14:45,1,1,8900,Yes,12,Poor shelf visibility
+Nalin Perera,SD0003,2026-01-08,09:00,4,4,15800,Yes,35,Great session - high volume
+Nalin Perera,SD0003,2026-01-01,09:30,3,3,16200,Yes,28,Good start to year
+Nalin Perera,SD0003,2025-12-25,09:15,5,5,17000,Yes,40,Christmas boost
+Nalin Perera,SD0016,2026-01-07,16:00,2,2,8300,Yes,18,Late visit - owner busy
+Nalin Perera,SD0016,2025-12-31,16:30,1,1,7800,Yes,15,Rushed visit
+Nalin Perera,SD0016,2025-12-24,16:15,2,2,9000,Yes,20,Average

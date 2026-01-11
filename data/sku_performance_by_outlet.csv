@@ -1,0 +1,21 @@
+outlet_id,sku_id,sku_name,sales_last_week,sales_last_month,rank,stock_status,avg_weekly_sales
+SD0001,SKU001,Coca-Cola 500ml,45,180,1,In Stock,42
+SD0001,SKU003,Fanta Orange 500ml,38,152,2,Low Stock,35
+SD0001,SKU002,Sprite 500ml,32,128,3,In Stock,30
+SD0001,SKU008,Kinley Water 500ml,28,112,4,In Stock,26
+SD0001,SKU010,Minute Maid Orange 500ml,22,88,5,In Stock,20
+SD0002,SKU001,Coca-Cola 500ml,25,100,1,In Stock,23
+SD0002,SKU008,Kinley Water 500ml,22,88,2,In Stock,20
+SD0002,SKU002,Sprite 500ml,18,72,3,Low Stock,17
+SD0002,SKU003,Fanta Orange 500ml,15,60,4,Out of Stock,14
+SD0002,SKU010,Minute Maid Orange 500ml,12,48,5,In Stock,11
+SD0003,SKU001,Coca-Cola 500ml,52,208,1,In Stock,48
+SD0003,SKU004,Coca-Cola 1L,48,192,2,In Stock,45
+SD0003,SKU002,Sprite 500ml,42,168,3,In Stock,40
+SD0003,SKU003,Fanta Orange 500ml,38,152,4,In Stock,35
+SD0003,SKU008,Kinley Water 500ml,35,140,5,In Stock,32
+SD0016,SKU001,Coca-Cola 500ml,18,72,1,Low Stock,16
+SD0016,SKU008,Kinley Water 500ml,15,60,2,In Stock,14
+SD0016,SKU002,Sprite 500ml,12,48,3,In Stock,11
+SD0016,SKU003,Fanta Orange 500ml,10,40,4,Out of Stock,9
+SD0016,SKU010,Minute Maid Orange 500ml,8,32,5,In Stock,7
