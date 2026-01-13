@@ -1,8 +1,11 @@
-outlet_id,outlet_name,outlet_type,area,district,poi_nearby,poi_count,traffic_level,cooler_available,shelf_space_sqft
-SD0001,Saman's Mart,SMMT,Nugegoda,Colombo,Schools|Bus Stop|Bank,3,High,Yes,12.5
-SD0002,City Bites Cafe,Eatery,Maharagama,Colombo,Schools|Hospital,2,Medium,Yes,8.0
-SD0003,Perera Super,SMMT,Pannipitiya,Colombo,Schools|Park|Temple,3,High,Yes,15.0
-SD0016,Quick Snacks,Eatery,Kottawa,Colombo,Bus Stop|Market,2,Medium,No,6.0
-SD0004,Lanka Stores,Non-Eatery,Dehiwala,Colombo,Beach|Hotels,2,High,Yes,10.0
-SD0005,Fresh Foods,Eatery,Mount Lavinia,Colombo,Beach|Restaurants,2,High,Yes,9.0
-SD0006,Sunrise Mart,SMMT,Ratmalana,Colombo,Airport|Hotels,2,Medium,Yes,11.0
+outlet_id,outlet_name,outlet_type,area,district,latitude,longitude,poi_nearby,poi_count,traffic_level,cooler_available,shelf_space_sqft
+SD0001,Saman's Mart,SMMT,Nugegoda,Colombo,6.8774,79.8892,Schools|Bus Stop|Bank,3,High,Yes,12.5
+SD0002,City Bites Cafe,Eatery,Maharagama,Colombo,6.8488,79.9267,Schools|Hospital,2,Medium,Yes,8.0
+SD0003,Perera Super,SMMT,Pannipitiya,Colombo,6.8436,79.9615,Schools|Park|Temple,3,High,Yes,15.0
+SD0016,Quick Snacks,Eatery,Kottawa,Colombo,6.8108,79.9614,Bus Stop|Market,2,Medium,No,6.0
+SD0004,Lanka Stores,Non-Eatery,Dehiwala,Colombo,6.8536,79.8633,Beach|Hotels,2,High,Yes,10.0
+SD0005,Fresh Foods,Eatery,Mount Lavinia,Colombo,6.8373,79.8638,Beach|Restaurants,2,High,Yes,9.0
+SD0006,Sunrise Mart,SMMT,Ratmalana,Colombo,6.8218,79.8864,Airport|Hotels,2,Medium,Yes,11.0
+SD0007,Green Valley Store,SMMT,Piliyandala,Colombo,6.8005,79.9220,Schools|Market|Temple,3,Medium,Yes,13.0
+SD0008,Spice Corner,Eatery,Boralesgamuwa,Colombo,6.8413,79.9042,Office Complex|Bus Stop,2,High,Yes,7.5
+SD0009,Metro Convenience,SMMT,Kesbewa,Colombo,6.7977,79.9301,Railway Station|Market,2,High,Yes,14.5

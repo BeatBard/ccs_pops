@@ -1,85 +1,79 @@
 """
-LangGraph State Schema
-Defines the conversation state structure
+LangGraph State Schema - Clean Architecture
+============================================
+
+Minimal, typed state for the DSR conversation workflow.
+Following LangGraph 2026 best practices:
+- Minimal state with only necessary fields
+- Type annotations for all fields
+- Optional fields marked accordingly
 """
 
-from typing import TypedDict, Annotated, Sequence, Optional
-from langchain_core.messages import BaseMessage
-from langgraph.graph import add_messages
+from typing import Optional, List, Dict, Any
+from typing_extensions import TypedDict
 from datetime import datetime
 
 
-class ConversationState(TypedDict):
+class ConversationState(TypedDict, total=False):
     """
-    State schema for the sales coaching conversation
-    """
-    # Messages history
-    messages: Annotated[Sequence[BaseMessage], add_messages]
+    Minimal state for DSR conversation workflow
 
-    # User context
+    Following LangGraph best practices:
+    - Minimal state with only necessary fields
+    - Type annotations for all fields
+    - Optional fields marked accordingly
+    """
+    # Core identifiers
     dsr_name: str
-    dsr_phone: str
-    dsr_profile: Optional[dict]
+    target_date: str  # ISO format: YYYY-MM-DD
 
-    # Conversation state
-    current_state: str  # IDLE, GREETING, ACTIVE, AT_OUTLET, COACHING, DAY_COMPLETE
+    # State management (from States enum in constants.py)
+    current_state: str
     previous_state: Optional[str]
 
-    # Session context
-    current_outlet: Optional[str]
-    outlets_visited_today: list[str]
-    daily_plan: Optional[dict]
+    # User interaction
+    user_message: str
+    intent: Optional[str]  # From Intent enum
+    button_action: Optional[str]  # From ButtonAction enum
 
-    # Flags
-    morning_checkin_done: bool
-    end_of_day_done: bool
+    # Context for outlet flow
+    outlet_number: Optional[int]
 
-    # Interactive elements
-    buttons: Optional[list[dict]]  # Button configurations for WhatsApp interactive messages
-    template_type: Optional[str]  # Current template type being shown (greeting, plan_view, etc.)
-    menu_context: Optional[str]  # Current menu context (greeting_menu, plan_view, outlet_select, etc.)
+    # Response data
+    response_message: str
+    response_buttons: List[Dict[str, str]]
+    template_type: str
 
-    # Metadata
-    conversation_id: str
-    created_at: str
-    updated_at: str
+    # Additional response data
+    response_data: Optional[Dict[str, Any]]
 
-
-# State constants
-class States:
-    """Conversation state constants"""
-    IDLE = "IDLE"
-    GREETING_MENU = "GREETING_MENU"  # Showing main greeting menu
-    PLAN_VIEW_MENU = "PLAN_VIEW_MENU"  # Showing plan view options
-    OUTLET_SELECT = "OUTLET_SELECT"  # User selecting outlet from numbered list
-    AWAITING_RESPONSE = "AWAITING_RESPONSE"
-    ACTIVE = "ACTIVE"
-    AT_OUTLET = "AT_OUTLET"
-    COACHING = "COACHING"
-    VISIT_TRACKING = "VISIT_TRACKING"
-    DAY_COMPLETE = "DAY_COMPLETE"
+    # Error handling
+    error: Optional[str]
 
 
-def create_initial_state(phone_number: str, dsr_name: str = "Nalin Perera") -> ConversationState:
-    """Create initial conversation state"""
-    now = datetime.now().isoformat()
+def create_initial_state(dsr_name: str, target_date: datetime) -> ConversationState:
+    """
+    Create initial state for a new conversation
 
-    return ConversationState(
-        messages=[],
-        dsr_name=dsr_name,
-        dsr_phone=phone_number,
-        dsr_profile=None,
-        current_state=States.IDLE,
-        previous_state=None,
-        current_outlet=None,
-        outlets_visited_today=[],
-        daily_plan=None,
-        morning_checkin_done=False,
-        end_of_day_done=False,
-        buttons=None,
-        template_type=None,
-        menu_context=None,
-        conversation_id=f"{phone_number}_{now}",
-        created_at=now,
-        updated_at=now
-    )
+    Args:
+        dsr_name: Name of the DSR
+        target_date: Target date for the conversation
+
+    Returns:
+        Initial conversation state
+    """
+    return {
+        "dsr_name": dsr_name,
+        "target_date": target_date.strftime("%Y-%m-%d"),
+        "current_state": "IDLE",
+        "previous_state": None,
+        "user_message": "",
+        "intent": None,
+        "button_action": None,
+        "outlet_number": None,
+        "response_message": "",
+        "response_buttons": [],
+        "template_type": "text",
+        "response_data": None,
+        "error": None
+    }

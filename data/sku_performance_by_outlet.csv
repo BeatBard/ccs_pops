@@ -1,21 +1,51 @@
-outlet_id,sku_id,sku_name,sales_last_week,sales_last_month,rank,stock_status,avg_weekly_sales
-SD0001,SKU001,Coca-Cola 500ml,45,180,1,In Stock,42
-SD0001,SKU003,Fanta Orange 500ml,38,152,2,Low Stock,35
-SD0001,SKU002,Sprite 500ml,32,128,3,In Stock,30
-SD0001,SKU008,Kinley Water 500ml,28,112,4,In Stock,26
-SD0001,SKU010,Minute Maid Orange 500ml,22,88,5,In Stock,20
-SD0002,SKU001,Coca-Cola 500ml,25,100,1,In Stock,23
-SD0002,SKU008,Kinley Water 500ml,22,88,2,In Stock,20
-SD0002,SKU002,Sprite 500ml,18,72,3,Low Stock,17
-SD0002,SKU003,Fanta Orange 500ml,15,60,4,Out of Stock,14
-SD0002,SKU010,Minute Maid Orange 500ml,12,48,5,In Stock,11
-SD0003,SKU001,Coca-Cola 500ml,52,208,1,In Stock,48
-SD0003,SKU004,Coca-Cola 1L,48,192,2,In Stock,45
-SD0003,SKU002,Sprite 500ml,42,168,3,In Stock,40
-SD0003,SKU003,Fanta Orange 500ml,38,152,4,In Stock,35
-SD0003,SKU008,Kinley Water 500ml,35,140,5,In Stock,32
-SD0016,SKU001,Coca-Cola 500ml,18,72,1,Low Stock,16
-SD0016,SKU008,Kinley Water 500ml,15,60,2,In Stock,14
-SD0016,SKU002,Sprite 500ml,12,48,3,In Stock,11
-SD0016,SKU003,Fanta Orange 500ml,10,40,4,Out of Stock,9
-SD0016,SKU010,Minute Maid Orange 500ml,8,32,5,In Stock,7
+outlet_id,sku_name,avg_sales_per_visit_litres,rank
+SD0001,Coca-Cola 1L,850,1
+SD0001,Sprite 1L,620,2
+SD0001,Fanta Orange 1L,480,3
+SD0001,Kinley Water 1L,380,4
+SD0001,Minute Maid Orange 1L,290,5
+SD0002,Coca-Cola 1L,520,1
+SD0002,Sprite 1L,380,2
+SD0002,Kinley Water 1L,310,3
+SD0002,Fanta Orange 1L,240,4
+SD0002,Minute Maid Orange 1L,180,5
+SD0003,Coca-Cola 1L,980,1
+SD0003,Sprite 1L,720,2
+SD0003,Fanta Orange 1L,650,3
+SD0003,Kinley Water 1L,550,4
+SD0003,Minute Maid Orange 1L,420,5
+SD0016,Coca-Cola 1L,420,1
+SD0016,Kinley Water 1L,280,2
+SD0016,Sprite 1L,240,3
+SD0016,Fanta Orange 1L,180,4
+SD0016,Minute Maid Orange 1L,120,5
+SD0004,Coca-Cola 1L,480,1
+SD0004,Sprite 1L,350,2
+SD0004,Fanta Orange 1L,280,3
+SD0004,Kinley Water 1L,260,4
+SD0004,Minute Maid Orange 1L,190,5
+SD0005,Coca-Cola 1L,590,1
+SD0005,Sprite 1L,430,2
+SD0005,Fanta Orange 1L,380,3
+SD0005,Kinley Water 1L,320,4
+SD0005,Minute Maid Orange 1L,250,5
+SD0006,Coca-Cola 1L,740,1
+SD0006,Sprite 1L,540,2
+SD0006,Fanta Orange 1L,480,3
+SD0006,Kinley Water 1L,410,4
+SD0006,Minute Maid Orange 1L,320,5
+SD0007,Coca-Cola 1L,630,1
+SD0007,Sprite 1L,460,2
+SD0007,Fanta Orange 1L,390,3
+SD0007,Kinley Water 1L,340,4
+SD0007,Minute Maid Orange 1L,260,5
+SD0008,Coca-Cola 1L,410,1
+SD0008,Sprite 1L,300,2
+SD0008,Fanta Orange 1L,240,3
+SD0008,Kinley Water 1L,200,4
+SD0008,Minute Maid Orange 1L,150,5
+SD0009,Coca-Cola 1L,820,1
+SD0009,Sprite 1L,600,2
+SD0009,Fanta Orange 1L,530,3
+SD0009,Kinley Water 1L,460,4
+SD0009,Minute Maid Orange 1L,350,5

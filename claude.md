@@ -219,99 +219,298 @@ Eatery: 5 | SMMT: 3
 
 ---
 
-## Example Conversation Flow
+## Updated Conversation Flow (Phase 1 - POC)
 
-### Morning Start
-**Agent:**
-```
-Good morning, Nalin!
-
-You've got 3 outlets on your route today. Two of them are priority outlets.
-Would you like me to summarize your targets before you start?
-```
-
-**DSR:** Yes, please.
-
-**Agent:**
-```
-Here's your plan for today:
-
-SD0001 – Expected: 12,000 | Last: 13,500 ✅ Ahead of target
-SD0002 – Expected: 10,000 | Last: 9,200 ⚠️ Behind target
-SD0003 – Expected: 15,000 | Last: 15,800 ✅ Ahead of target
-
-You're performing well in your priority outlets. SD0002 needs a little push.
-Would you like a few ideas to improve sales there?
-```
-
-**DSR:** Yes, tell me but tell me how to push them?
+### Flow Overview
+The conversation follows a **3-button navigation pattern** throughout, with context-aware responses:
+1. **Check-in 🌅** - Start the day and view plan
+2. **Outlet විස්තර 📍** - View outlet characteristics and get coaching
+3. **දවස අවසානය 🌙** - End of day summary
 
 ---
 
-### Coaching Suggestion
-**Agent:**
+## Detailed Flow with Examples
+
+### 1️⃣ Initial Greeting (Entry Point)
+**Trigger:** User sends "Hi", "Hello", "හායි", "හෙලෝ", or any greeting
+
+**Agent Response:**
 ```
-You're a top DSR with good communication skills based on your past month coaching scores you've got. So come on you can!
+👋 සුභ උදෑසනක් [DSR Name]!
 
-For SD0002, last week's feedback showed lower shelf visibility. You could try:
-1. Rechecking product placement
-2. Offering the "Buy 5 cases – 1 case free" promo
+මම ඔබේ *Pocket Coach* 🎯
 
-Want me to remind you when you reach that outlet?
+ඔබේ දවසේ සෑම අවස්ථාවකම ඔබට උදව් කරන්න මම සූදානම්!
+
+මම ඔබට කරන්න පුළුවන්:
+• දවස Check-in කරන්න සහ plan එක බලන්න
+• Outlet විස්තර සහ coaching ලබා ගන්න
+• දවසේ summary එක බලන්න
+
+ඔබට අද මොනවා කරන්න ඕනද? 💪
 ```
 
-**DSR:** Sure, do that.
+**Buttons:**
+1. ✅ Check-in 🌅
+2. 📍 Outlet විස්තර
+3. 🌙 දවස අවසානය
 
 ---
 
-### Prioritization Insight
-**Agent:**
+### 2️⃣ Check-in Flow (Button 1: Check-in 🌅)
+
+**Agent Response:**
 ```
-Focus on SD0003 first, it's a priority outlet and currently 12% behind.
-Improving here can quickly boost your daily score.
+🌅 *අද දවසේ සැලැස්ම*
+
+📊 අද ඔබේ Plan එක:
+• මුළු Outlets: 10
+• Priority Outlets: 5 ⭐
+• Outlet වර්ග: SMMT (5), Eatery (3), Non-Eatery (2)
+• ප්‍රදේශ: Nugegoda, Maharagama, Pannipitiya, Kottawa, Dehiwala
+
+🎯 අද දවසේ Target: 105,000L
+
+හොඳ දවසක් ගත කරන්න! ඔබ කැමති මොනවාද බලන්න? 🚀
+```
+
+**Buttons:**
+1. 🗺️ ප්‍රදේශ අනුව Outlets
+2. 📍 Outlet විස්තර
+3. 🌙 දවස අවසානය
+
+---
+
+### 3️⃣ Area-wise Outlets (Button 1: ප්‍රදේශ අනුව Outlets)
+
+**Agent Response:**
+```
+🗺️ *ප්‍රදේශ අනුව Outlets*
+
+📍 *Nugegoda* (2 Outlets)
+1. ⭐ Saman's Mart (SMMT) - Target: 12,000L
+   📌 https://maps.google.com/?q=6.8774,79.8892
+
+2. City Bites Cafe (Eatery) - Target: 10,000L
+   📌 https://maps.google.com/?q=6.8774,79.8892
+
+---
+
+📍 *Maharagama* (1 Outlet)
+3. ⭐ Perera Super (SMMT) - Target: 15,000L
+   📌 https://maps.google.com/?q=6.8488,79.9267
+
+---
+
+📍 *Kottawa* (1 Outlet)
+4. Quick Snacks (Eatery) - Target: 8,000L
+   📌 https://maps.google.com/?q=6.8108,79.9614
+
+Outlet විස්තර බලන්න outlet number එක type කරන්න (උදා: 1) 👇
+```
+
+**Buttons:**
+1. 🗺️ ප්‍රදේශ අනුව Outlets
+2. 📍 Outlet විස්තර
+3. 🌙 දවස අවසානය
+
+---
+
+### 4️⃣ Outlet Characteristics Flow (Button 2: Outlet විස්තර)
+
+#### Step 4A: Request Outlet Number
+**Agent Response:**
+```
+📍 *Outlet විස්තර*
+
+කරුණාකර ඔබට විස්තර බලන්න ඕන outlet එකේ number එක type කරන්න:
+
+උදාහරණය: 1 (Saman's Mart සඳහා)
+
+ඔබේ අද දවසේ outlets:
+1. ⭐ Saman's Mart (Nugegoda)
+2. ⭐ City Bites Cafe (Maharagama)
+3. ⭐ Perera Super (Pannipitiya)
+4. Quick Snacks (Kottawa)
+5. Lanka Stores (Dehiwala)
+...
+```
+
+**User types:** `1`
+
+---
+
+#### Step 4B: Message 1 - Outlet Statistics
+**Agent Response:**
+```
+📊 *Saman's Mart - SMMT Outlet*
+
+🏪 *Outlet විස්තර:*
+• වර්ගය: SMMT (Supermarket)
+• ප්‍රදේශය: Nugegoda
+• Priority: ⭐ ඉහළ
+
+📈 *විකුණුම් දත්ත:*
+• අද Target: 12,000L
+• පසුගිය visit: 13,500L ✅ (Target අතිරේකයි)
+• අවසන් මාස 3 සාමාන්‍යය: 12,800L/visit
+• මාසික Target: 150,000L
+• මාසික සම්පූර්ණ කළ ප්‍රමාණය: 85,000L (56.7%)
+
+🔝 *වඩාත්ම විකුණෙන භාණ්ඩ:*
+1. Coca-Cola 1L - 850L/visit
+2. Sprite 1L - 620L/visit
+3. Fanta Orange 1L - 480L/visit
+
+💡 *විශේෂ සටහන:*
+• Cooler ඇත: ✅ Yes
+• Shelf space: 12.5 sqft
+• ප්‍රදේශය: Schools, Bus Stop, Bank අසල
 ```
 
 ---
 
-### Motivation & Tip
-**Agent:**
+#### Step 4C: Message 2 - AI-Generated Coaching
+**Agent Response (AI-Generated in Sinhala):**
 ```
-Also, try checking if the store has enough stock of fast-moving SKUs.
-If not, upsell 1 more case of the top-performing item from last week.
+💡 *Coaching Tips - Gemini AI*
 
-Would you like me to show which SKU performed best?
+මේ outlet එක හොඳට perform කරනවා! 👏
+
+✨ *අද උත්සාහ කරන්න:*
+
+• Coca-Cola සහ Sprite හොඳට විකුණෙනවා - අද Fanta variety 2-3ක් add කරන්න try කරන්න
+
+• Schools අසල නිසා, පොඩි bottles (200ml-400ml) promote කරන්න - school children ට හොඳයි
+
+• පසුගිය visit එකේ target එක ඉක්මවලා - අද හොඳ relationship එකක් තියෙනවා කතා කරන්න easy
+
+• පොඩි offer එකක් දෙන්න: 5 cases ගත්තොත් 1 case free - මාසික target complete කරන්න help කරයි
+
+ඔබට හැකියි! 💪 Customer handling skills use කරලා සාර්ථක visit එකක් කරන්න!
 ```
 
-**DSR:** Yes, that'll help, but same time can you tell me how I can approach this outlet to buy this SKU? I need help?
-
-**Agent:**
-```
-Orange Crush --> Here are some tips (full detail nice tips short and sweet):
-
-1. Start with rapport - ask how business has been
-2. Mention you noticed they're running low on Orange Crush
-3. Show data: "This SKU sold 15 units last week - customers love it"
-4. Offer the promotion: "Buy 5 cases, get 1 free today only"
-5. Create urgency: "Stock is limited for this promo"
-6. Ask for commitment: "Shall I add 5 cases to your order?"
-
-Remember: Be confident but not pushy. Listen to their concerns.
-```
+**Buttons:**
+1. 🗺️ ප්‍රදේශ අනුව Outlets
+2. 📍 Outlet විස්තර
+3. 🌙 දවස අවසානය
 
 ---
 
-### End of Day Wrap Up (Agent - Wrap up)
-**Agent:**
+### 5️⃣ End of Day Summary (Button 3: දවස අවසානය)
+
+**Agent Response:**
 ```
-You've completed all assigned outlets today.
+🌙 *අද දවසේ Summary*
 
-2 outlets ahead of target, 1 slightly behind.
-Overall, your target achievement rate is 96% - well done!
+🎯 *ඔබේ Performance:*
 
-Would you like to review tomorrow's plan?
+📊 *සාරාංශය:*
+• Visit කළ Outlets: 8 / 10
+• සැලැස්ම සපුරා ගැනීම: 80%
+• Priority Outlets Covered: 4 / 5 ⭐
+• සාර්ථක Visits: 7 (87.5%)
+
+💰 *විකුණුම්:*
+• අද මුළු විකුණුම: 92,500L
+• අද Target: 105,000L
+• ඉලක්ක සපුරා ගැනීම: 88.1%
+
+📈 *Outlets Performance:*
+• Target අතිරේක: 5 outlets ✅
+• Target අඩු: 2 outlets ⚠️
+• Visit නොකළ: 2 outlets
+
+🏆 *වර්ධනය:*
+• ඊයේට වඩා: +15% ⬆️
+• සතිය සාමාන්‍යය: +8% ⬆️
+
+---
+
+💡 *හෙට දිනය සඳහා:*
+අද visit නොකළ 2 outlets හෙට plan කරන්න:
+• Lanka Stores (Dehiwala) - 9,000L Target
+• Fresh Foods (Mount Lavinia) - 11,000L Target
+
+හොඳ කොටස! අද හොඳට perform කළා! 👏
+හෙට තව හොඳට කරමු! විශ්‍රාම ගන්න. 😊💪
 ```
 
-**DSR:** Sure, let's do that tomorrow morning.
+**Buttons:**
+1. ✅ Check-in 🌅
+2. 📍 Outlet විස්තර
+3. 🌙 දවස අවසානය
+
+---
+
+## Key Features of New Flow
+
+### ✅ Navigation Pattern
+- **Consistent 3-button navigation** throughout the entire flow
+- Context-aware button behavior (e.g., "Outlet විස්තර" asks for number after area view)
+- Users can move between any section at any time
+
+### ✅ Sinhala + Emojis
+- All text in natural, conversational Sinhala
+- Emojis used throughout for visual appeal and clarity
+- Technical terms avoided - simple language only
+
+### ✅ Metrics in Litres
+- All sales figures shown in litres (L)
+- Clear, consistent formatting (e.g., "12,000L")
+- Percentage completion for targets
+
+### ✅ Google Maps Integration
+- Direct Google Maps links for each outlet
+- Format: `https://maps.google.com/?q=latitude,longitude`
+- Easy navigation for DSRs in the field
+
+### ✅ Priority Indicators
+- Star icon (⭐) for priority outlets
+- Visual distinction throughout the flow
+- Helps DSRs prioritize their visits
+
+### ✅ AI-Generated Coaching
+- Uses Gemini 2.0 Flash for coaching generation
+- Context-aware tips based on outlet performance
+- Personalized, actionable advice in Sinhala
+- Encourages DSRs with positive reinforcement
+
+---
+
+## Button Flow Summary
+
+```
+┌─────────────────────────┐
+│   Initial Greeting      │
+│  (Hi/Hello/හායි/හෙලෝ)  │
+└────────┬────────────────┘
+         │
+    ┌────▼────┐
+    │ Welcome │
+    │ Message │
+    └────┬────┘
+         │
+    ┌────▼─────────────────────────┐
+    │  [Check-in] [Outlet] [End]  │
+    └─┬──────────┬────────────┬────┘
+      │          │            │
+      │          │            └─────► End Summary
+      │          │                    [Check-in] [Outlet] [End]
+      │          │
+      │          └────────────────► Outlet විස්තර
+      │                             (Ask for outlet #)
+      │                             ↓
+      │                             Statistics + AI Coaching
+      │                             [Area] [Outlet] [End]
+      │
+      └─────────────────────────► Check-in Plan
+                                  ↓
+                                  [Area] [Outlet] [End]
+                                  ↓
+                                  Area-wise Outlets
+                                  [Area] [Outlet] [End]
+```
 
 ---
 

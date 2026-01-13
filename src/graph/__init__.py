@@ -1,14 +1,13 @@
 """
 LangGraph Module
-Exports the compiled conversation graph
+Exports the compiled conversation workflow
 """
 
-from .graph import graph_app
-from .state import ConversationState, States, create_initial_state
+from .workflow import compiled_workflow
+from .state import ConversationState, create_initial_state
 
 __all__ = [
-    "graph_app",
+    "compiled_workflow",
     "ConversationState",
-    "States",
     "create_initial_state",
 ]

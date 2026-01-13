@@ -1,28 +1,59 @@
 """
 WhatsApp Content Templates Configuration
-Defines static button templates for Twilio WhatsApp
+=========================================
 
-To use these templates:
+Defines static button templates for Twilio WhatsApp integration.
+
+IMPORTANT CONSTRAINTS:
+- WhatsApp allows MAX 3 Quick Reply buttons for unapproved session templates
+- Button text must be under 20 characters
+- Emojis are allowed in button text
+- Template body uses {{1}} for dynamic content
+
+Setup Instructions:
 1. Go to Twilio Console > Messaging > Content Template Builder
-2. Create Quick Reply templates (work in 24hr session without approval)
+2. Create Quick Reply templates with the button configurations below
 3. Copy the Content SID (starts with HX...)
-4. Set the environment variable in .env file
+4. Set the environment variables in your .env file
+
+Environment Variables:
+    TWILIO_CONTENT_SID_GREETING  - Greeting menu template
+    TWILIO_CONTENT_SID_AREA_VIEW - Area view template
+    TWILIO_CONTENT_SID_HELP      - Help menu template
 """
 
 import os
 from typing import Dict, List, Optional
 from enum import Enum
 
+
+# =============================================================================
+# TEMPLATE TYPES
+# =============================================================================
 class TemplateType(Enum):
-    """Template types for different conversation stages"""
-    GREETING = "greeting"
-    PLAN_VIEW = "plan_view"
-    OUTLET_SELECT = "outlet_select"
-    HELP = "help"
+    """
+    Template types for different conversation stages.
+    
+    Each type corresponds to a Content Template in Twilio Console.
+    """
+    GREETING = "greeting"         # Main menu after greeting
+    PLAN_VIEW = "plan_view"       # Plan viewing options
+    OUTLET_SELECT = "outlet_select"  # Not used (outlets shown as numbered list)
+    HELP = "help"                 # Help menu
 
 
+# =============================================================================
+# BUTTON TEMPLATE CLASS
+# =============================================================================
 class ButtonTemplate:
-    """Represents a WhatsApp button template"""
+    """
+    Represents a WhatsApp Quick Reply button template.
+    
+    Attributes:
+        name: Template name for identification
+        content_sid: Twilio Content Template SID (HX...)
+        buttons: List of button configurations
+    """
 
     def __init__(self, name: str, content_sid: str, buttons: List[Dict[str, str]]):
         self.name = name
@@ -30,11 +61,11 @@ class ButtonTemplate:
         self.buttons = buttons
 
     def get_button_ids(self) -> List[str]:
-        """Get list of button IDs for this template"""
+        """Get list of button IDs for this template."""
         return [btn["id"] for btn in self.buttons]
 
     def get_button_by_text(self, text: str) -> Optional[Dict[str, str]]:
-        """Find button by its text (case-insensitive)"""
+        """Find button by its display text (case-insensitive)."""
         text_lower = text.lower().strip()
         for btn in self.buttons:
             if btn["text"].lower() == text_lower:
@@ -42,51 +73,85 @@ class ButtonTemplate:
         return None
 
 
-# Define button templates
-# IMPORTANT: WhatsApp allows MAX 3 Quick Reply buttons for unapproved session templates!
+# =============================================================================
+# BUTTON TEMPLATE CONFIGURATIONS
+# =============================================================================
+# IMPORTANT: WhatsApp allows MAX 3 Quick Reply buttons for unapproved templates!
+
 BUTTON_TEMPLATES = {
-    # Greeting menu - shown when user says Hi/Hello (3 buttons max)
+    # ─────────────────────────────────────────────────────────────────────────
+    # GREETING MENU
+    # Shown when user says Hi/Hello or after most actions
+    # Maps to ButtonAction constants from src/core/constants.py
+    # ─────────────────────────────────────────────────────────────────────────
     TemplateType.GREETING: ButtonTemplate(
         name="greeting_menu",
         content_sid=os.getenv("TWILIO_CONTENT_SID_GREETING", ""),
         buttons=[
-            {"id": "my_plan", "text": "මගේ සැලැස්ම 📋", "action": "show_plan"},
-            {"id": "my_status", "text": "තත්ත්වය 📊", "action": "show_status"},
-            {"id": "checkin", "text": "Check-in ✅", "action": "morning_checkin"}
+            {"id": "checkin", "text": "Check-in 🌅", "action": "CHECKIN"},
+            {"id": "outlet_details", "text": "Outlet විස්තර 📍", "action": "OUTLET_DETAILS"},
+            {"id": "end_summary", "text": "දවස අවසානය 🌙", "action": "END_SUMMARY"}
         ]
     ),
 
-    # Plan view options - shown when user wants to see their plan (3 buttons)
+    # ─────────────────────────────────────────────────────────────────────────
+    # AREA VIEW
+    # Shown after check-in or when viewing outlets by area
+    # ─────────────────────────────────────────────────────────────────────────
     TemplateType.PLAN_VIEW: ButtonTemplate(
-        name="plan_view_options",
-        content_sid=os.getenv("TWILIO_CONTENT_SID_PLAN_VIEW", ""),
+        name="area_view",
+        content_sid=os.getenv("TWILIO_CONTENT_SID_AREA_VIEW", ""),
         buttons=[
-            {"id": "top3", "text": "ප්‍රමුඛ 3 📍", "action": "show_top3"},
-            {"id": "full_list", "text": "සම්පූර්ණ ලැයිස්තුව", "action": "show_full_list"},
-            {"id": "back", "text": "ආපසු 🔙", "action": "back_to_greeting"}
+            {"id": "area_view", "text": "ප්‍රදේශ අනුව 🗺️", "action": "AREA_VIEW"},
+            {"id": "outlet_details", "text": "Outlet විස්තර 📍", "action": "OUTLET_DETAILS"},
+            {"id": "end_summary", "text": "දවස අවසානය 🌙", "action": "END_SUMMARY"}
         ]
     ),
 
-    # Help menu (3 buttons max)
+    # ─────────────────────────────────────────────────────────────────────────
+    # HELP MENU
+    # Shown when user needs help or types "help"
+    # ─────────────────────────────────────────────────────────────────────────
     TemplateType.HELP: ButtonTemplate(
         name="help_menu",
         content_sid=os.getenv("TWILIO_CONTENT_SID_HELP", ""),
         buttons=[
-            {"id": "morning", "text": "දවස පටන් ගන්න 🌅", "action": "morning_checkin"},
-            {"id": "visit", "text": "Outlet යන්න 📍", "action": "show_help_visit"},
-            {"id": "record", "text": "විකුණුම් ලියන්න 💰", "action": "show_help_sales"}
+            {"id": "checkin", "text": "Check-in 🌅", "action": "CHECKIN"},
+            {"id": "outlet_details", "text": "Outlet විස්තර 📍", "action": "OUTLET_DETAILS"},
+            {"id": "back", "text": "ආපසු 🔙", "action": "BACK"}
         ]
     )
 }
 
 
+# =============================================================================
+# TEMPLATE ACCESS FUNCTIONS
+# =============================================================================
 def get_template(template_type: TemplateType) -> Optional[ButtonTemplate]:
-    """Get button template by type"""
+    """
+    Get button template by type.
+    
+    Args:
+        template_type: The type of template to retrieve
+        
+    Returns:
+        ButtonTemplate if found, None otherwise
+    """
     return BUTTON_TEMPLATES.get(template_type)
 
 
 def get_template_by_button_text(button_text: str) -> Optional[tuple[TemplateType, Dict[str, str]]]:
-    """Find which template and button matches the given button text"""
+    """
+    Find which template and button matches the given button text.
+    
+    Useful for determining user intent from button clicks.
+    
+    Args:
+        button_text: The text of the clicked button
+        
+    Returns:
+        Tuple of (TemplateType, button_dict) if found, None otherwise
+    """
     for template_type, template in BUTTON_TEMPLATES.items():
         button = template.get_button_by_text(button_text)
         if button:
@@ -94,14 +159,28 @@ def get_template_by_button_text(button_text: str) -> Optional[tuple[TemplateType
     return None
 
 
+# =============================================================================
+# OUTLET LIST FORMATTING
+# =============================================================================
 def format_outlet_list(outlets: List[Dict], show_top_n: Optional[int] = None) -> str:
     """
-    Format outlet list as numbered text (NOT buttons - Twilio constraint)
-
+    Format outlet list as numbered text.
+    
+    Outlets are shown as a numbered list (NOT buttons) because:
+    - Twilio doesn't support dynamic buttons
+    - WhatsApp has a 3-button limit
+    - Lists can have unlimited items
+    
+    User selects an outlet by typing the number.
+    
     Args:
-        outlets: List of outlet dictionaries
+        outlets: List of outlet dictionaries with keys:
+                 - outlet_id: Outlet identifier (e.g., "SD0001")
+                 - outlet_name: Display name
+                 - priority: "Yes" or "No"
+                 - target_sales: Target sales amount
         show_top_n: If provided, show only top N outlets
-
+        
     Returns:
         Formatted string with numbered outlets
     """
@@ -109,7 +188,6 @@ def format_outlet_list(outlets: List[Dict], show_top_n: Optional[int] = None) ->
         return "📭 අද outlets නැහැ"
 
     outlets_to_show = outlets[:show_top_n] if show_top_n else outlets
-
     lines = ["📍 *ඔබගේ Outlets:*\n"]
 
     for i, outlet in enumerate(outlets_to_show, 1):
@@ -121,59 +199,82 @@ def format_outlet_list(outlets: List[Dict], show_top_n: Optional[int] = None) ->
         lines.append(f"{i}. *{outlet_id}* - {outlet_name}{priority}")
         lines.append(f"   Target: LKR {target:,.0f}\n")
 
-    # Add instruction
+    # Add selection instruction
     lines.append("\n💡 *Outlet එකක් තෝරන්න:*")
     lines.append("අංකය type කරන්න (උදා: 1, 2, 3...)")
 
     return "\n".join(lines)
 
 
-# Template creation instructions for Twilio Console
+# =============================================================================
+# TEMPLATE CREATION INSTRUCTIONS
+# =============================================================================
 TEMPLATE_INSTRUCTIONS = """
-# Creating Content Templates in Twilio Console
+================================================================================
+CREATING CONTENT TEMPLATES IN TWILIO CONSOLE
+================================================================================
 
-## IMPORTANT: WhatsApp allows MAX 3 buttons for unapproved session templates!
+⚠️ IMPORTANT: WhatsApp allows MAX 3 buttons for unapproved session templates!
 
-## Step 1: Go to Twilio Console
+STEP 1: Go to Twilio Console
+─────────────────────────────
 Navigate to: Messaging > Content Template Builder
 
-## Step 2: Create Quick Reply Templates (3 buttons each!)
+STEP 2: Create Quick Reply Templates (3 buttons each!)
+─────────────────────────────────────────────────────
 
-### Template 1: Greeting Menu (greeting_menu)
-- Type: Quick Reply
-- Body: {{1}}  (This allows dynamic greeting text)
-- Add 3 Quick Reply Buttons:
-  1. මගේ සැලැස්ම 📋 (id: my_plan)
-  2. තත්ත්වය 📊 (id: my_status)
-  3. Check-in ✅ (id: checkin)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TEMPLATE 1: Greeting Menu (greeting_menu)                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Type: Quick Reply                                                            │
+│ Body: {{1}}  (Dynamic greeting text)                                         │
+│                                                                              │
+│ Buttons:                                                                     │
+│   1. Check-in 🌅         (id: checkin)                                       │
+│   2. Outlet විස්තර 📍    (id: outlet_details)                               │
+│   3. දවස අවසානය 🌙       (id: end_summary)                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-### Template 2: Plan View Options (plan_view_options)
-- Type: Quick Reply
-- Body: {{1}}  (Dynamic message)
-- Add 3 Quick Reply Buttons:
-  1. ප්‍රමුඛ 3 📍 (id: top3)
-  2. සම්පූර්ණ ලැයිස්තුව (id: full_list)
-  3. ආපසු 🔙 (id: back)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TEMPLATE 2: Area View (area_view)                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Type: Quick Reply                                                            │
+│ Body: {{1}}  (Dynamic message)                                               │
+│                                                                              │
+│ Buttons:                                                                     │
+│   1. ප්‍රදේශ අනුව 🗺️      (id: area_view)                                     │
+│   2. Outlet විස්තර 📍    (id: outlet_details)                               │
+│   3. දවස අවසානය 🌙       (id: end_summary)                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-### Template 3: Help Menu (help_menu)
-- Type: Quick Reply
-- Body: {{1}}  (Dynamic message)
-- Add 3 Quick Reply Buttons:
-  1. දවස පටන් ගන්න 🌅 (id: morning)
-  2. Outlet යන්න 📍 (id: visit)
-  3. විකුණුම් ලියන්න 💰 (id: record)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TEMPLATE 3: Help Menu (help_menu)                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Type: Quick Reply                                                            │
+│ Body: {{1}}  (Dynamic message)                                               │
+│                                                                              │
+│ Buttons:                                                                     │
+│   1. Check-in 🌅         (id: checkin)                                       │
+│   2. Outlet විස්තර 📍    (id: outlet_details)                               │
+│   3. ආපසු 🔙             (id: back)                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-## Step 3: Copy Content SIDs
+STEP 3: Copy Content SIDs
+─────────────────────────
 After creating each template, copy the Content SID (starts with HX...)
 
-## Step 4: Add to .env file
-```
+STEP 4: Add to .env file
+────────────────────────
 TWILIO_CONTENT_SID_GREETING=HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_CONTENT_SID_PLAN_VIEW=HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_CONTENT_SID_AREA_VIEW=HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_CONTENT_SID_HELP=HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
 
-## Note
-Quick Reply buttons work within 24-hour sessions WITHOUT approval!
-Keep button text under 20 characters!
+NOTES
+─────
+- Quick Reply buttons work within 24-hour sessions WITHOUT approval!
+- Keep button text under 20 characters
+- Emojis are allowed in button text
+- Error 63013 = policy violation (check message content format)
+
+================================================================================
 """

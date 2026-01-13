@@ -1,4 +1,11 @@
-dsr_name,date,outlet_id,outlet_name,outlet_type,priority,target_sales,last_visit_sales,status,visit_order,completed
-Nalin Perera,2026-01-11,SD0001,Saman's Mart,SMMT,Yes,12000,13500,Pending,1,No
-Nalin Perera,2026-01-11,SD0002,City Bites Cafe,Eatery,No,10000,9200,Pending,2,No
-Nalin Perera,2026-01-11,SD0003,Perera Super,SMMT,Yes,15000,15800,Pending,3,No
+dsr_name,date,outlet_id,outlet_name,outlet_type,area,priority,target_sales_litres,last_visit_sales_litres,visit_order,completed
+Nalin Perera,2026-01-13,SD0001,Saman's Mart,SMMT,Nugegoda,Yes,12000,13500,1,No
+Nalin Perera,2026-01-13,SD0002,City Bites Cafe,Eatery,Maharagama,Yes,10000,9200,2,No
+Nalin Perera,2026-01-13,SD0003,Perera Super,SMMT,Pannipitiya,Yes,15000,15800,3,No
+Nalin Perera,2026-01-13,SD0016,Quick Snacks,Eatery,Kottawa,No,8000,7500,4,No
+Nalin Perera,2026-01-13,SD0004,Lanka Stores,Non-Eatery,Dehiwala,No,9000,8800,5,No
+Nalin Perera,2026-01-13,SD0005,Fresh Foods,Eatery,Mount Lavinia,No,11000,10500,6,No
+Nalin Perera,2026-01-13,SD0006,Sunrise Mart,SMMT,Ratmalana,Yes,13000,12800,7,No
+Nalin Perera,2026-01-13,SD0007,Green Valley Store,SMMT,Piliyandala,No,10500,11200,8,No
+Nalin Perera,2026-01-13,SD0008,Spice Corner,Eatery,Boralesgamuwa,No,7500,7000,9,No
+Nalin Perera,2026-01-13,SD0009,Metro Convenience,SMMT,Kesbewa,Yes,14000,13900,10,No

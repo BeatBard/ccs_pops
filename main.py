@@ -1,24 +1,44 @@
+"""
+DSR Sales Coaching Assistant - Main Application
+================================================
+
+A WhatsApp-based sales coaching assistant for Distribution Sales Representatives (DSRs).
+Built with FastAPI, LangGraph, and Twilio WhatsApp API.
+
+Key Features:
+- Morning check-in with daily plan
+- Real-time outlet coaching with LIPB tracking
+- Sales recording and progress tracking
+- End-of-day performance summary
+
+Author: CCS Team
+"""
+
+# =============================================================================
+# IMPORTS
+# =============================================================================
 from fastapi import FastAPI, HTTPException, Form, Response, BackgroundTasks
 from pydantic import BaseModel
 from twilio.rest import Client
 from twilio.twiml.messaging_response import MessagingResponse
-from langchain_core.messages import HumanMessage
 import os
 import json
 from dotenv import load_dotenv
 import logging
 from datetime import datetime
 
-# Import LangGraph components
-from src.graph import graph_app, create_initial_state, States
-
-# Import WhatsApp button templates
+# Local imports
+from src.graph.workflow import compiled_workflow
+from src.graph.state import create_initial_state
+from src.core.constants import States
 from src.whatsapp import get_template, TemplateType
 
-# Load environment variables
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
 load_dotenv()
 
-# Configure logging with detailed format
+# Logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',
@@ -26,60 +46,73 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Set logging levels for different modules
-logging.getLogger("src.graph.nodes").setLevel(logging.DEBUG)
-logging.getLogger("src.graph.edges").setLevel(logging.DEBUG)
-logging.getLogger("src.tools").setLevel(logging.DEBUG)
+# Set module-specific log levels for debugging
+logging.getLogger("src.graph.workflow").setLevel(logging.DEBUG)
+logging.getLogger("src.handlers").setLevel(logging.DEBUG)
+logging.getLogger("src.core").setLevel(logging.DEBUG)
 
-app = FastAPI(title="DSR Sales Coaching Assistant")
-
-# Twilio credentials
+# =============================================================================
+# TWILIO CONFIGURATION
+# =============================================================================
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")  # Format: whatsapp:+14155238886
+USE_CONTENT_TEMPLATES = os.getenv("USE_CONTENT_TEMPLATES", "true").lower() == "true"
 
 # Initialize Twilio client
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
+# =============================================================================
+# SESSION MANAGEMENT
+# =============================================================================
 # In-memory session store (for POC - use Redis/DB in production)
-user_sessions = {}
+user_sessions: dict = {}
+
+# =============================================================================
+# FASTAPI APPLICATION
+# =============================================================================
+app = FastAPI(
+    title="DSR Sales Coaching Assistant",
+    description="WhatsApp-based sales coaching for DSRs",
+    version="1.0.0"
+)
 
 
+# =============================================================================
+# PYDANTIC MODELS
+# =============================================================================
 class MessageRequest(BaseModel):
+    """Request model for sending WhatsApp messages"""
     to_number: str  # Format: whatsapp:+1234567890
     message: str
 
 
-@app.get("/")
-def read_root():
-    return {
-        "message": "DSR Sales Coaching Assistant",
-        "status": "running",
-        "active_sessions": len(user_sessions)
-    }
-
-
-def send_whatsapp_with_template(to_number: str, message: str, template_type: str = None):
+# =============================================================================
+# WHATSAPP MESSAGING FUNCTIONS
+# =============================================================================
+def send_whatsapp_with_template(to_number: str, message: str, template_type: str = None) -> str:
     """
-    Send WhatsApp message using Twilio Content Templates
-
+    Send WhatsApp message using Twilio Content Templates.
+    
     Args:
         to_number: WhatsApp number (format: whatsapp:+1234567890)
-        message: Dynamic message content
-        template_type: Template type (greeting, plan_view, help)
-
-    Content Templates must be created in Twilio Console first.
-    See src/whatsapp/templates.py for instructions.
-    """
-    # Content Templates work in Sandbox for Quick Reply buttons within 24hr session
-    # BUT message content must NOT have: emojis, double newlines, or >4 consecutive spaces
-    # Error 63013 = policy violation from bad content format
-    USE_TEMPLATES = os.getenv("USE_CONTENT_TEMPLATES", "true").lower() == "true"
+        message: Dynamic message content for the template variable {{1}}
+        template_type: Template type ('greeting', 'plan_view', 'help')
     
+    Returns:
+        Message SID if successful, None otherwise
+    
+    Note:
+        - Content Templates must be created in Twilio Console first
+        - WhatsApp allows MAX 3 buttons for unapproved session templates
+        - Message content must NOT have: excessive emojis, double newlines
+        - Error 63013 = policy violation from bad content format
+    """
     try:
-        # Get Content SID from template configuration
         content_sid = None
-        if template_type and USE_TEMPLATES:
+        
+        # Get Content SID from template configuration
+        if template_type and USE_CONTENT_TEMPLATES:
             template = get_template(TemplateType(template_type))
             if template and template.content_sid:
                 content_sid = template.content_sid
@@ -89,105 +122,158 @@ def send_whatsapp_with_template(to_number: str, message: str, template_type: str
 
         # Send with Content Template if available
         if content_sid:
-            try:
-                content_vars = {"1": message}
-                logger.info(f"📤 Template variables: {json.dumps(content_vars)}")
-
-                msg = client.messages.create(
-                    content_sid=content_sid,
-                    content_variables=json.dumps(content_vars),
-                    from_=TWILIO_WHATSAPP_NUMBER,
-                    to=to_number
-                )
-
-                # Log detailed response
-                logger.info(f"✅ Sent with Content Template to {to_number}")
-                logger.info(f"   Message SID: {msg.sid}")
-                logger.info(f"   Status: {msg.status}")
-                logger.info(f"   Direction: {msg.direction}")
-                logger.info(f"   Date created: {msg.date_created}")
-                if hasattr(msg, 'error_code') and msg.error_code:
-                    logger.error(f"   Error code: {msg.error_code}")
-                    logger.error(f"   Error message: {msg.error_message}")
-
-                return msg.sid
-            except Exception as e:
-                logger.warning(f"⚠️ Content Template failed: {e}, falling back to plain text")
-
-        # Fallback: Send as plain text with text-based buttons
-        logger.info(f"📤 Sending as PLAIN TEXT (no template)")
+            return _send_with_template(to_number, message, content_sid)
         
-        # Add text-based button hints for greeting
-        if template_type == "greeting":
-            message += "\n\n📱 *Reply with:*\n"
-            message += "• \"1\" - මගේ අද දවසේ සැලැස්ම\n"
-            message += "• \"2\" - මගේ වර්තමාන තත්ත්වය\n"
-            message += "• \"3\" - උදව් අවශ්‍යයි\n"
-            message += "• \"4\" - අද Check-in කරන්න"
-        elif template_type == "plan_view":
-            message += "\n\n📱 *Reply with:*\n"
-            message += "• \"1\" - Top 3 Outlet\n"
-            message += "• \"2\" - සම්පූර්ණ ලැයිස්තුව\n"
-            message += "• \"3\" - නැවත පසුට"
-        
-        msg = client.messages.create(
-            body=message,
-            from_=TWILIO_WHATSAPP_NUMBER,
-            to=to_number
-        )
-        logger.info(f"✅ Sent plain message to {to_number}")
-        logger.info(f"   Message SID: {msg.sid}")
-        logger.info(f"   Status: {msg.status}")
-        logger.info(f"   Direction: {msg.direction}")
-        if hasattr(msg, 'error_code') and msg.error_code:
-            logger.error(f"   Error code: {msg.error_code}")
-            logger.error(f"   Error message: {msg.error_message}")
-        return msg.sid
+        # Fallback: Send as plain text
+        return _send_plain_text(to_number, message, template_type)
 
     except Exception as e:
         logger.error(f"❌ Error sending message: {e}")
         return None
 
 
+def _send_with_template(to_number: str, message: str, content_sid: str) -> str:
+    """Send message using Twilio Content Template."""
+    try:
+        # Content variables must be JSON string with keys matching template {{1}}, {{2}}, etc.
+        content_vars_json = json.dumps({"1": message})
+        logger.info(f"📤 Content SID: {content_sid}")
+        logger.info(f"📤 Template variables: {content_vars_json}")
+        logger.info(f"📤 From: {TWILIO_WHATSAPP_NUMBER}")
+        logger.info(f"📤 To: {to_number}")
+
+        msg = client.messages.create(
+            content_sid=content_sid,
+            content_variables=content_vars_json,
+            from_=TWILIO_WHATSAPP_NUMBER,
+            to=to_number
+        )
+
+        _log_message_response(msg, "Content Template", to_number)
+        return msg.sid
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Content Template failed: {e}")
+        logger.warning(f"   Falling back to plain text")
+        return None
+
+
+def _send_plain_text(to_number: str, message: str, template_type: str = None) -> str:
+    """Send plain text message with optional text-based button hints."""
+    logger.info(f"📤 Sending as PLAIN TEXT (no template)")
+    
+    # Add text-based button hints based on template type
+    if template_type == "greeting":
+        message += "\n\n📱 *Reply with:*\n"
+        message += "• \"1\" - මගේ අද දවසේ සැලැස්ම\n"
+        message += "• \"2\" - මගේ වර්තමාන තත්ත්වය\n"
+        message += "• \"3\" - උදව් අවශ්‍යයි\n"
+        message += "• \"4\" - අද Check-in කරන්න"
+    elif template_type == "plan_view":
+        message += "\n\n📱 *Reply with:*\n"
+        message += "• \"1\" - Top 3 Outlet\n"
+        message += "• \"2\" - සම්පූර්ණ ලැයිස්තුව\n"
+        message += "• \"3\" - නැවත පසුට"
+    
+    msg = client.messages.create(
+        body=message,
+        from_=TWILIO_WHATSAPP_NUMBER,
+        to=to_number
+    )
+    
+    _log_message_response(msg, "Plain text", to_number)
+    return msg.sid
+
+
+def _log_message_response(msg, message_type: str, to_number: str):
+    """Log Twilio message response details."""
+    logger.info(f"✅ Sent {message_type} message to {to_number}")
+    logger.info(f"   Message SID: {msg.sid}")
+    logger.info(f"   Status: {msg.status}")
+    logger.info(f"   Direction: {msg.direction}")
+    
+    if hasattr(msg, 'error_code') and msg.error_code:
+        logger.error(f"   Error code: {msg.error_code}")
+        logger.error(f"   Error message: {msg.error_message}")
+
+
+# =============================================================================
+# MESSAGE PROCESSING
+# =============================================================================
 def process_message_async(phone_number: str, message_body: str):
-    """Process message through LangGraph in background"""
+    """
+    Process incoming WhatsApp message through LangGraph.
+
+    This function runs in the background to avoid blocking the webhook response.
+
+    Args:
+        phone_number: User's WhatsApp number
+        message_body: Content of the incoming message
+    """
     try:
         # Get or create session
         if phone_number not in user_sessions:
-            user_sessions[phone_number] = create_initial_state(phone_number)
-            logger.info(f"Created new session for {phone_number}")
+            # Create initial state with default DSR name (in production, lookup from DB)
+            user_sessions[phone_number] = create_initial_state(
+                dsr_name="Nalin Perera",
+                target_date=datetime.now()
+            )
+            logger.info(f"✨ Created new session for {phone_number}")
 
         # Get current state
         state = user_sessions[phone_number]
 
-        # Add user message to state
-        state["messages"].append(HumanMessage(content=message_body))
-        state["updated_at"] = datetime.now().isoformat()
+        # Parse message for button action or text
+        button_action = None
+        # Check if message is a button action (from Twilio button clicks)
+        # Twilio sends button actions in UPPERCASE, convert to match ButtonAction enum (lowercase)
+        message_upper = message_body.strip().upper()
+        if message_upper in ["CHECKIN", "AREA_VIEW", "OUTLET_DETAILS", "END_SUMMARY", "BACK"]:
+            # Convert to lowercase to match ButtonAction enum values
+            button_action = message_upper
+            logger.info(f"   ├── Button detected: {message_upper}")
 
-        # Invoke graph with config for checkpointing
+        # Update state with user message and button action
+        state["user_message"] = message_body
+        state["button_action"] = button_action
+
+        logger.info(f"📩 Processing: '{message_body}' (button: {button_action})")
+
+        # Invoke LangGraph with checkpointing config
         config = {"configurable": {"thread_id": phone_number}}
-        result = graph_app.invoke(state, config)
+        result = compiled_workflow.invoke(state, config)
 
         # Update session with new state
         user_sessions[phone_number] = result
 
-        # Get AI response (last message)
-        if result["messages"]:
-            ai_response = result["messages"][-1].content
-            template_type = result.get("template_type")  # Get from state
+        # Send AI response back to user
+        response_message = result.get("response_message", "")
+        template_type = result.get("template_type", "text")
 
-            logger.info(f"📱 Sending response with template: {template_type or 'None (plain text)'}")
-
-            # Send response back to user with appropriate template
-            send_whatsapp_with_template(phone_number, ai_response, template_type)
-
-            logger.info(f"✅ Processed message for {phone_number}, state: {result['current_state']}")
+        if response_message:
+            logger.info(f"📱 Sending response with template: {template_type}")
+            send_whatsapp_with_template(phone_number, response_message, template_type)
+            logger.info(f"✅ Processed message for {phone_number}, state: {result.get('current_state', 'UNKNOWN')}")
+        else:
+            logger.warning(f"⚠️ No response message generated for {phone_number}")
 
     except Exception as e:
         logger.error(f"❌ Error processing message: {e}", exc_info=True)
-        # Send error message
         error_msg = "සමාවෙන්න, දෝෂයක් සිදු විය. කරුණාකර නැවත උත්සාහ කරන්න."
         send_whatsapp_with_template(phone_number, error_msg)
+
+
+# =============================================================================
+# API ENDPOINTS
+# =============================================================================
+@app.get("/")
+def read_root():
+    """Health check endpoint."""
+    return {
+        "message": "DSR Sales Coaching Assistant",
+        "status": "running",
+        "active_sessions": len(user_sessions)
+    }
 
 
 @app.post("/webhook")
@@ -197,24 +283,27 @@ async def whatsapp_webhook(
     From: str = Form()
 ):
     """
-    Receive incoming WhatsApp messages from Twilio webhook
+    Twilio webhook endpoint for incoming WhatsApp messages.
+    
+    Messages are processed in the background to return a quick response
+    to Twilio (avoiding timeout issues).
     """
     logger.info(f"Received message from {From}: {Body}")
-
-    # Send processing indicator immediately
-    resp = MessagingResponse()
 
     # Process message in background
     background_tasks.add_task(process_message_async, From, Body)
 
     # Return empty TwiML response immediately
+    resp = MessagingResponse()
     return Response(content=str(resp), media_type="application/xml")
 
 
 @app.post("/send-whatsapp")
 def send_whatsapp_message(request: MessageRequest):
     """
-    Send a WhatsApp message using Twilio
+    Manual endpoint to send a WhatsApp message.
+    
+    Useful for testing and administrative purposes.
     """
     try:
         message = client.messages.create(
@@ -234,6 +323,9 @@ def send_whatsapp_message(request: MessageRequest):
         raise HTTPException(status_code=500, detail=f"Failed to send message: {str(e)}")
 
 
+# =============================================================================
+# APPLICATION ENTRY POINT
+# =============================================================================
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
