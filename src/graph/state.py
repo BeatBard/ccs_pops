@@ -41,6 +41,7 @@ class ConversationState(TypedDict, total=False):
 
     # Response data
     response_message: str
+    response_messages: Optional[List[str]]  # For multi-message responses (e.g., outlet details + coaching)
     response_buttons: List[Dict[str, str]]
     template_type: str
 
@@ -72,6 +73,7 @@ def create_initial_state(dsr_name: str, target_date: datetime) -> ConversationSt
         "button_action": None,
         "outlet_number": None,
         "response_message": "",
+        "response_messages": None,
         "response_buttons": [],
         "template_type": "text",
         "response_data": None,

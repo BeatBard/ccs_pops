@@ -248,9 +248,17 @@ def process_message_async(phone_number: str, message_body: str):
 
         # Send AI response back to user
         response_message = result.get("response_message", "")
+        response_messages = result.get("response_messages", [])
         template_type = result.get("template_type", "text")
 
-        if response_message:
+        # Handle multiple messages (for outlet details with coaching)
+        if response_messages:
+            logger.info(f"📱 Sending {len(response_messages)} separate messages with template: {template_type}")
+            for i, msg in enumerate(response_messages, 1):
+                logger.info(f"   └── Message {i}/{len(response_messages)}")
+                send_whatsapp_with_template(phone_number, msg, template_type)
+            logger.info(f"✅ Processed message for {phone_number}, state: {result.get('current_state', 'UNKNOWN')}")
+        elif response_message:
             logger.info(f"📱 Sending response with template: {template_type}")
             send_whatsapp_with_template(phone_number, response_message, template_type)
             logger.info(f"✅ Processed message for {phone_number}, state: {result.get('current_state', 'UNKNOWN')}")

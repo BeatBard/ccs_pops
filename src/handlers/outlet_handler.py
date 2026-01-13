@@ -171,11 +171,10 @@ class OutletHandler:
         # Generate AI coaching (Message 2 as per CLAUDE.md)
         coaching_message = self._generate_coaching(dsr_name, stats)
 
-        # Combine both messages
-        full_message = f"{stats_message}\n\n{coaching_message}"
-
+        # Return TWO separate messages to avoid WhatsApp policy violations (Error 63013)
+        # Long messages with complex Sinhala content trigger spam detection
         return {
-            "message": full_message,
+            "messages": [stats_message, coaching_message],  # Send as 2 separate messages
             "next_state": States.OUTLET_DETAILS,
             "buttons": self._get_standard_buttons(),
             "template_type": "plan_view",  # Use PLAN_VIEW template (outlet_details not in Twilio)

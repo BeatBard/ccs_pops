@@ -113,6 +113,7 @@ def greeting_node(state: ConversationState) -> dict:
 
         return {
             "response_message": result["message"],
+            "response_messages": None,  # Clear multi-message field
             "response_buttons": result["buttons"],
             "template_type": result["template_type"],
             "current_state": result["next_state"],
@@ -155,6 +156,7 @@ def checkin_node(state: ConversationState) -> dict:
 
         return {
             "response_message": result["message"],
+            "response_messages": None,  # Clear multi-message field
             "response_buttons": result["buttons"],
             "template_type": result["template_type"],
             "current_state": result["next_state"],
@@ -197,6 +199,7 @@ def area_view_node(state: ConversationState) -> dict:
 
         return {
             "response_message": result["message"],
+            "response_messages": None,  # Clear multi-message field
             "response_buttons": result["buttons"],
             "template_type": result["template_type"],
             "current_state": result["next_state"],
@@ -238,6 +241,7 @@ def outlet_select_node(state: ConversationState) -> dict:
 
         return {
             "response_message": result["message"],
+            "response_messages": None,  # Clear multi-message field
             "response_buttons": result["buttons"],
             "template_type": result["template_type"],
             "current_state": result["next_state"],
@@ -293,14 +297,28 @@ def outlet_details_node(state: ConversationState) -> dict:
         logger.info(f"   ├── Next state: {result['next_state']}")
         logger.info(f"   └── Data: {result.get('data', {})}")
 
-        return {
-            "response_message": result["message"],
-            "response_buttons": result["buttons"],
-            "template_type": result["template_type"],
-            "current_state": result["next_state"],
-            "previous_state": state.get("current_state"),
-            "response_data": result.get("data")
-        }
+        # Handle multiple messages (for outlet details, we send 2 separate messages)
+        if "messages" in result:
+            logger.info(f"   └── Sending {len(result['messages'])} separate messages")
+            return {
+                "response_message": "",  # Clear single message field
+                "response_messages": result["messages"],  # Multiple messages to send
+                "response_buttons": result["buttons"],
+                "template_type": result["template_type"],
+                "current_state": result["next_state"],
+                "previous_state": state.get("current_state"),
+                "response_data": result.get("data")
+            }
+        else:
+            return {
+                "response_message": result["message"],
+                "response_messages": None,  # Clear multi-message field
+                "response_buttons": result["buttons"],
+                "template_type": result["template_type"],
+                "current_state": result["next_state"],
+                "previous_state": state.get("current_state"),
+                "response_data": result.get("data")
+            }
 
     except Exception as e:
         logger.error(f"❌ Error in outlet details node: {e}")
@@ -338,6 +356,7 @@ def summary_node(state: ConversationState) -> dict:
 
         return {
             "response_message": result["message"],
+            "response_messages": None,  # Clear multi-message field
             "response_buttons": result["buttons"],
             "template_type": result["template_type"],
             "current_state": result["next_state"],
